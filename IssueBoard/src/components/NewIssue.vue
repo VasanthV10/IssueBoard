@@ -6,16 +6,21 @@ export default {
     name: "IssuesList",
     setup() {
         let issueData = ref([]);
-        onMounted(() => console.log(issueData.value))
         function saveIssue() {
             var title = document.getElementById("title").value;
             var description = document.getElementById("description").value;
             let mapData = { "title": title, "description": description };
-            JSON.parse(window.localStorage.getItem('issueData'));
+            if(JSON.parse(window.localStorage.getItem('issues'))?.length > 0) {
+                let data = JSON.parse(window.localStorage.getItem('issues'));
+                for(let i = 0 ; i<data.length;i++) {
+                    issueData.value.push(data[i]);
+                }
+            }
             issueData.value.push({...mapData});
             window.localStorage.setItem("issues", JSON.stringify(this.issueData));
             document.getElementById('title').value='';
             document.getElementById('description').value='';
+            issueData.value = [];
         }
         onUpdated(() => {
             console.log("Updated");
