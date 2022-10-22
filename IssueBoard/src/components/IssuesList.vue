@@ -5,11 +5,11 @@
         <div class = "button">
             <button @click="newIssue()"> Create New Issue</button>
         </div>
-        <div v-bind:key="issue.title" v-for="issue in items" class="list">
-            <h1> Title : {{issue.title}} </h1>
-            <h1> Description : {{issue.description}} </h1>
-            <button @click="editButton()" class = "editButton"> edit </button>
-            <button @click="deleteButton()" class = "deleteButton"> delete </button>
+        <div v-bind:key="issue.title" v-for="(issue,index) in items" class="list">
+            <h2> Title : {{issue.title}} </h2>
+            <h2> Description : {{issue.description}} </h2>
+            <button :id = "'edit' + index" @click="editButton()" class = "editButton"> edit </button>
+            <button :id = "'delete' + index" @click="deleteButton()" class = "deleteButton"> delete </button>
         </div>
     </div>
 </template>
@@ -56,7 +56,7 @@ export default {
 }
 .list {
     display: block;
-    height: 100px;
+    height: 80px;
     width: 100%;
     border: 2px solid;
     background-color: aliceblue;
@@ -66,7 +66,7 @@ export default {
 .editButton {
     position: absolute;
     right: 150px;
-    top: 35px;
+    top: 25px;
     width: 100px;
     height: 30px;
     border-radius: 3px;
@@ -79,7 +79,7 @@ export default {
 .deleteButton {
     position: absolute;
     right: 40px;
-    top: 35px;
+    top: 25px;
     width: 100px;
     height: 30px;
     border-radius: 3px;

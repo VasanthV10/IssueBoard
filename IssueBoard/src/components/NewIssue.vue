@@ -9,6 +9,10 @@ export default {
         function saveIssue() {
             var title = document.getElementById("title").value;
             var description = document.getElementById("description").value;
+            if(title == "" && description == "") {
+                alert("Please fill atleast one field");
+                return;
+            }
             let mapData = { "title": title, "description": description };
             if(JSON.parse(window.localStorage.getItem('issues'))?.length > 0) {
                 let data = JSON.parse(window.localStorage.getItem('issues'));
@@ -22,10 +26,6 @@ export default {
             document.getElementById('description').value='';
             issueData.value = [];
         }
-        onUpdated(() => {
-            console.log("Updated");
-        })
-
         return {
             saveIssue,
             issueData
@@ -36,42 +36,83 @@ export default {
 
 <template>
 <div class="screen">
-    <center><h1>Create New Issue </h1></center>
+    <center><h1 style="font-weight:bolder;color: magenta;"><u>Create New Issue </u></h1></center>
     <div class = "text">
         <label class = "label"> Title </label>
-        <input type="text" id = "title" class="textbox"/>
+        <div class="textbox">
+            <input type="text" id = "title"  required>
+        </div>
+    </div>
+    <div class = "text">
         <label class = "label"> Description </label>
-        <textarea id = "description" class="textbox"></textarea>
-        <div class = "button">
-            <button @click="saveIssue()"> Add Issue</button>
+        <div class="textbox">
+            <textarea id = "description" style="height:100px;" required></textarea>
+        </div>
+        <div class = "buttonClass">
+            <button @click="saveIssue()" class="button"> Add Issue</button>
         </div>
     </div>
 </div>
 </template>
 <style scoped>
+
+* {
+  box-sizing: border-box;
+}
 .screen {
     width :100%;
     height : 100%;
     border: 5px solid blue;
+    padding: 16px;
+    border-radius: 10px;
 }
 .text {
-    height: 100%;
+    content: "";
+    display: table;
+    clear: both;
     width: 100%;
-    padding-bottom: 10px;
 }
-.button {
-    width: inherit;
-    text-align: center;
+.buttonClass {
+    width: 100%;
+    left: 500px;
+    display: flex;  
+justify-content: flex-end;  
+align-items: flex-end; 
 }
 .label {
-    width: 300px;
-    display: block;
-    padding: 10px;
+    float: left;
+    width: 50%;
+    margin-top: 6px;
+    color: blueviolet;
+    font-weight: bolder;
+    font-size: large;
 }
 .textbox {
-    display: flex;
-    width: 200px;
-    height: 50px;
+    float: left;
+    width: inherit;
+    margin-top: 6px;
+}
+input[type=text], textarea {
+    padding: 12px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 2px solid black;
+    box-sizing: border-box;
+    width: 300px;
+}
+.button {
+    width:120px;
+    height:30px;
+    background-color: #04AA6D;
+    color: white;
+    font-weight: 400;
+    font-size: medium;
+    cursor: pointer;
+    margin: auto;
+}
+.button:hover {
+    font-weight: 600;
+    opacity: 0.8;
 }
 
 </style>
