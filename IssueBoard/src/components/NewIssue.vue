@@ -1,10 +1,14 @@
 
 <script>
 import { onMounted,ref,onUpdated } from 'vue';
+import router from "../router/index.js";
 
 export default {
-    name: "IssuesList",
+    name: "NewIssue",
     setup() {
+        function issues() {
+            router.push("/issues");
+        }
         let issueData = ref([]);
         function saveIssue() {
             var title = document.getElementById("title").value;
@@ -24,10 +28,14 @@ export default {
             window.localStorage.setItem("issues", JSON.stringify(this.issueData));
             document.getElementById('title').value='';
             document.getElementById('description').value='';
+            var x = document.getElementById("snackbar");
+            x.className = "show";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
             issueData.value = [];
         }
         return {
             saveIssue,
+            issues,
             issueData
         }
     }
@@ -35,8 +43,13 @@ export default {
 </script>
 
 <template>
+    <div class="header">
+        <p>Issue Board</p>
+        <div class="active">
+            <button @click="issues()">Home</button>
+        </div>
+    </div>
 <div class="screen">
-    <center><h1 style="font-weight:bolder;color: magenta;"><u>Create New Issue </u></h1></center>
     <div class = "text">
         <label class = "label"> Title </label>
         <div class="textbox">
@@ -52,6 +65,7 @@ export default {
             <button @click="saveIssue()" class="button"> Add Issue</button>
         </div>
     </div>
+    <div id="snackbar"> Issue Added Successfully.</div>
 </div>
 </template>
 <style scoped>
@@ -59,12 +73,14 @@ export default {
 * {
   box-sizing: border-box;
 }
+
 .screen {
     width :100%;
     height : 100%;
     border: 5px solid blue;
     padding: 16px;
     border-radius: 10px;
+    font-family: Arial, Helvetica, sans-serif;
 }
 .text {
     content: "";
@@ -76,8 +92,8 @@ export default {
     width: 100%;
     left: 500px;
     display: flex;  
-justify-content: flex-end;  
-align-items: flex-end; 
+    justify-content: flex-end;  
+    align-items: flex-end; 
 }
 .label {
     float: left;
@@ -113,6 +129,43 @@ input[type=text], textarea {
 .button:hover {
     font-weight: 600;
     opacity: 0.8;
+}
+#snackbar {
+  visibility: hidden;
+  min-width: 250px;
+  background-color: #333;
+  color: #fff;
+  border-radius: 2px;
+  padding: 16px;
+  position: fixed;
+  z-index: 1;
+  bottom: 30px;
+  font-size: 17px;
+}
+#snackbar.show {
+  visibility: visible;
+  -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+  animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadein {
+  from {left: 0; opacity: 0;} 
+  to {left: 30px; opacity: 1;}
+}
+
+@keyframes fadein {
+  from {left: 0; opacity: 0;}
+  to {left: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes fadeout {
+  from {left: 30px; opacity: 1;} 
+  to {left: 0; opacity: 0;}
+}
+
+@keyframes fadeout {
+  from {left: 30px; opacity: 1;}
+  to {left: 0; opacity: 0;}
 }
 
 </style>
