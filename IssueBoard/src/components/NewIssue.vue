@@ -5,11 +5,16 @@ import router from "../router/index.js";
 
 export default {
     name: "NewIssue",
-    setup() {
+    props : {
+        issueData : {
+            type: Array,
+            default: [],
+        }
+    },
+    setup(props) {
         function issues() {
             router.push("/issues");
         }
-        let issueData = ref([]);
         function saveIssue() {
             var title = document.getElementById("title").value;
             var description = document.getElementById("description").value;
@@ -21,22 +26,22 @@ export default {
             if(JSON.parse(window.localStorage.getItem('issues'))?.length > 0) {
                 let data = JSON.parse(window.localStorage.getItem('issues'));
                 for(let i = 0 ; i<data.length;i++) {
-                    issueData.value.push(data[i]);
+                    props.issueData.push(data[i]);
                 }
             }
-            issueData.value.push({...mapData});
-            window.localStorage.setItem("issues", JSON.stringify(this.issueData));
+            props.issueData.push({...mapData});
+            window.localStorage.setItem("issues", JSON.stringify(props.issueData));
             document.getElementById('title').value='';
             document.getElementById('description').value='';
             var x = document.getElementById("snackbar");
             x.className = "show";
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-            issueData.value = [];
+            props.issueData = [];
         }
         return {
             saveIssue,
             issues,
-            issueData
+            props,
         }
     }
 }

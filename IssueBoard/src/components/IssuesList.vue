@@ -8,11 +8,13 @@
     </div>
     <div class="screen">
         <h1>List Of Issues :</h1>
-        <div v-bind:key="issue.title" v-for="(issue,index) in items" class="list">
-            <h2> Title : {{issue.title}} </h2>
-            <h2> Description : {{issue.description}} </h2>
-            <button :id = "'edit' + index" @click="editButton()" class = "editButton"> edit </button>
-            <button :id = "'delete' + index" @click="deleteButton()" class = "deleteButton"> delete </button>
+        <div v-bind:key="issue" v-for="(issue,index) in items" class="list">
+            <div class = "content">
+                <h2 :id = "'title-' + index"> Title : {{issue.title}} </h2>
+                <h2 :id = "'description-' + index"> Description : {{issue.description}} </h2>
+                <button :id = "'edit-' + index" @click="editButton()" class = "editButton"> edit </button>
+                <button :id = "'delete-' + index" @click="deleteButton(index)" class = "deleteButton"> delete </button>
+            </div>
         </div>
     </div>
 </template>
@@ -20,22 +22,35 @@
 <script>
 import NewIssue from './NewIssue.vue';
 import router from "../router/index.js";
+import {onBeforeUpdate, reactive} from 'vue';
 
 export default {
     name: "IssuesList",
+    
     setup() {
+        const items = reactive(JSON.parse(localStorage.getItem("issues")));
         function newIssue() {
             router.push("/newIssue");
         }
         function editButton() {
             router.push("/newIssue/title");
         }
-        function deleteButton() {
-            var deleteData = JSON.parse(localStorage.getItem("issues"));
-            localStorage.removeItem("issues");
+        function deleteItems(arr,index) {
+            if (index > -1) {
+                arr.splice(index, 1);
+            }
+            return arr;
         }
+        function deleteButton(index) {
+            var data = deleteItems(items,index);
+            localStorage.clear();
+            localStorage.setItem("issues",JSON.stringify(data));
+        }
+        onBeforeUpdate (() => {
+            console.log(this);
+        });
         return {
-            items: JSON.parse(localStorage.getItem("issues")),
+            items,
             newIssue,
             editButton,
             deleteButton,
@@ -127,5 +142,8 @@ export default {
 .deleteButton:hover {
     background-color: #ddd;
     color: black;
+}
+.content {
+    padding: 4px;
 }
 </style>
