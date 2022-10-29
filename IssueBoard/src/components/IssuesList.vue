@@ -8,12 +8,12 @@
     </div>
     <div class="screen">
         <h1>List Of Issues :</h1>
-        <div v-bind:key="issue" v-for="(issue,index) in items" class="list">
+        <div  v-for="(issue,index) in items" class="list">
             <div class = "content">
                 <h2 :id = "'title-' + index"> Title : {{issue.title}} </h2>
                 <h2 :id = "'description-' + index"> Description : {{issue.description}} </h2>
-                <button :id = "'edit-' + index" @click="editButton()" class = "editButton"> edit </button>
-                <button :id = "'delete-' + index" @click="deleteButton(index)" class = "deleteButton"> delete </button>
+                <button :id = "'edit-' + index" @click="editButton(index)" class = "editButton"><i class="fa fa-edit"></i> edit </button>
+                <button :id = "'delete-' + index" @click="deleteButton(index)" class = "deleteButton"><i class="fa fa-trash"></i> delete </button>
             </div>
         </div>
     </div>
@@ -32,8 +32,11 @@ export default {
         function newIssue() {
             router.push("/newIssue");
         }
-        function editButton() {
-            router.push("/newIssue/title");
+        function editButton(index) {
+            var data = items[index];
+            console.log(data);
+            // const encodedData = encodeURIComponent(JSON.stringify(data))
+            router.push("/newIssue?data="+JSON.stringify(data));
         }
         function deleteItems(arr,index) {
             if (index > -1) {
@@ -44,11 +47,9 @@ export default {
         function deleteButton(index) {
             var data = deleteItems(items,index);
             localStorage.clear();
-            localStorage.setItem("issues",JSON.stringify(data));
+            window.localStorage.setItem("issues",JSON.stringify(data));
         }
-        onBeforeUpdate (() => {
-            console.log(this);
-        });
+        
         return {
             items,
             newIssue,
@@ -103,13 +104,15 @@ export default {
     
 }
 .list {
-    display: block;
+    display: flex;
     height: 80px;
     width: 100%;
-    border: 2px solid;
+    border: 1px solid steelblue;
     background-color: aliceblue;
     position: relative;
     font-size: 12px;
+    align-items: center;
+    border-radius: 4px;
 }
 .editButton {
     position: absolute;
@@ -144,6 +147,6 @@ export default {
     color: black;
 }
 .content {
-    padding: 4px;
+        margin: 20px;
 }
 </style>

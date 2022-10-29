@@ -1,6 +1,37 @@
+<template>
+    <div class="header">
+        <p>Issue Board</p>
+        <div class="active">
+            <button @click="issues()" style="width:100px;"><i class="fa fa-home"></i> Home</button>
+        </div>
+    </div>
+<div class="screen">
+    <div class = "text">
+        <label class = "label"> Title </label>
+        <div class="textbox">
+            <input v-if = "editScreen.screenData" type="text" id = "title"  required>
+            <input v-if = "editScreen.editable" type="text" id = "title" :value = "editScreen.editData.title" required>
+        </div>
+    </div>
+    <div class = "text">
+        <label class = "label"> Description </label>
+        <div class="textbox">
+            <textarea v-if = "editScreen.screenData" id = "description" style="height:100px;" required></textarea>
+            <textarea v-if = "editScreen.editable" id = "description" style="height:100px;" :value = "editScreen.editData.description" required></textarea>
+        </div>
+        <div v-if = "editScreen.screenData" class = "buttonClass">
+            <button @click="saveIssue()" class="button"> Add Issue</button>
+        </div>
+        <div v-if = "editScreen.editable" class = "buttonClass">
+            <button @click="updateIssue()" class="button"> Update Issue</button>
+        </div>
+    </div>
+    <div id="snackbar"></div>
+</div>
+</template>
 
 <script>
-import { onMounted,ref,onUpdated } from 'vue';
+import { onMounted, reactive } from 'vue';
 import router from "../router/index.js";
 
 export default {
@@ -12,9 +43,17 @@ export default {
         }
     },
     setup(props) {
+        const editScreen = reactive({
+            editable : false,
+            editData : {},
+            screenData : true,
+        });
         function issues() {
             router.push("/issues");
         }
+        onMounted ( () => {
+            urlParam();
+        });
         function saveIssue() {
             var title = document.getElementById("title").value;
             var description = document.getElementById("description").value;
@@ -30,49 +69,68 @@ export default {
                 }
             }
             props.issueData.push({...mapData});
+            localStorage.clear();
             window.localStorage.setItem("issues", JSON.stringify(props.issueData));
             document.getElementById('title').value='';
             document.getElementById('description').value='';
             var x = document.getElementById("snackbar");
             x.className = "show";
+            x.innerText = "Issue Added Successfully";
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
-            props.issueData = [];
+            props.issueData.splice(0);
+        }
+        function updateIssue() {
+            var title = document.getElementById("title").value;
+            var description = document.getElementById("description").value;
+            if(title == "" && description == "") {
+                alert("Please fill atleast one field");
+                return;
+            }
+            let data = JSON.parse(window.localStorage.getItem('issues'));
+            let params = new URLSearchParams(location.search);
+            let urlData = JSON.parse(params.get('data'));
+            if(title == urlData.title && description == urlData.description) {
+                alert("Please update any data");
+                return;
+            }
+            for(let i = 0 ; i < data.length;i++) {
+                    if(data[i].title == urlData.title || data[i].description == urlData.description) {
+                        data[i].title = title;
+                        data[i].description = description;
+                    }
+                    props.issueData.push(data[i]);
+            }
+            localStorage.clear();
+            window.localStorage.setItem("issues", JSON.stringify(props.issueData));
+            document.getElementById('title').value='';
+            document.getElementById('description').value='';
+            var x = document.getElementById("snackbar");
+            x.className = "show";
+            x.innerText = "Issue Updated Successfully";
+            setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            props.issueData.splice(0);
+            router.push("/issues");
+        }
+        function urlParam() {
+            let params = new URLSearchParams(location.search);
+            if(params.get('data')) {
+                editScreen.editData = JSON.parse(params.get('data'));
+                editScreen.editable = true;
+                editScreen.screenData = false;
+            }
         }
         return {
             saveIssue,
             issues,
             props,
+            editScreen,
+            urlParam,
+            updateIssue
         }
     }
 }
 </script>
 
-<template>
-    <div class="header">
-        <p>Issue Board</p>
-        <div class="active">
-            <button @click="issues()">Home</button>
-        </div>
-    </div>
-<div class="screen">
-    <div class = "text">
-        <label class = "label"> Title </label>
-        <div class="textbox">
-            <input type="text" id = "title"  required>
-        </div>
-    </div>
-    <div class = "text">
-        <label class = "label"> Description </label>
-        <div class="textbox">
-            <textarea id = "description" style="height:100px;" required></textarea>
-        </div>
-        <div class = "buttonClass">
-            <button @click="saveIssue()" class="button"> Add Issue</button>
-        </div>
-    </div>
-    <div id="snackbar"> Issue Added Successfully.</div>
-</div>
-</template>
 <style scoped>
 
 * {
