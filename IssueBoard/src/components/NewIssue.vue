@@ -11,6 +11,7 @@
         <div class="textbox">
             <input v-if = "editScreen.screenData" type="text" id = "title"  required>
             <input v-if = "editScreen.editable" type="text" id = "title" :value = "editScreen.editData.title" required>
+            <span class = "error"></span>
         </div>
     </div>
     <div class = "text">
@@ -18,6 +19,7 @@
         <div class="textbox">
             <textarea v-if = "editScreen.screenData" id = "description" style="height:100px;" required></textarea>
             <textarea v-if = "editScreen.editable" id = "description" style="height:100px;" :value = "editScreen.editData.description" required></textarea>
+            <span class = "error"></span>
         </div>
         <div v-if = "editScreen.screenData" class = "buttonClass">
             <button @click="saveIssue()" class="button"> Add Issue</button>
@@ -51,14 +53,35 @@ export default {
         function issues() {
             router.push("/issues");
         }
+        function validateInputField() {
+            var title = document.getElementById("title").value;
+            var description = document.getElementById("description").value;
+            const error = document.getElementsByClassName("error");
+            error[0].innerHTML = "";
+            error[1].innerHTML = "";
+            if(title == "" && description == "") {
+                error[0].innerHTML = "Title field is required";
+                error[1].innerHTML = "Description field is required";
+                return false;
+            }
+            else if(title == "") {
+                error[0].innerHTML = "Title field is required";
+                return false;
+            }
+            else if(description == "") {
+                error[1].innerHTML = "Description field is required";
+                return false;
+            }
+            else
+                return true;
+        }
         onMounted ( () => {
             urlParam();
         });
         function saveIssue() {
             var title = document.getElementById("title").value;
             var description = document.getElementById("description").value;
-            if(title == "" && description == "") {
-                alert("Please fill atleast one field");
+            if(!validateInputField()) {
                 return;
             }
             let mapData = { "title": title, "description": description };
@@ -82,15 +105,17 @@ export default {
         function updateIssue() {
             var title = document.getElementById("title").value;
             var description = document.getElementById("description").value;
-            if(title == "" && description == "") {
-                alert("Please fill atleast one field");
+            var x = document.getElementById("snackbar");
+            if(!validateInputField()) {
                 return;
             }
             let data = JSON.parse(window.localStorage.getItem('issues'));
             let params = new URLSearchParams(location.search);
             let urlData = JSON.parse(params.get('data'));
             if(title == urlData.title && description == urlData.description) {
-                alert("Please update any data");
+                x.className = "show";
+                x.innerText = "No changes to update";
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
                 return;
             }
             for(let i = 0 ; i < data.length;i++) {
@@ -104,7 +129,6 @@ export default {
             window.localStorage.setItem("issues", JSON.stringify(props.issueData));
             document.getElementById('title').value='';
             document.getElementById('description').value='';
-            var x = document.getElementById("snackbar");
             x.className = "show";
             x.innerText = "Issue Updated Successfully";
             setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
@@ -195,7 +219,7 @@ input[type=text], textarea {
 }
 #snackbar {
   visibility: hidden;
-  min-width: 250px;
+  min-width: 200px;
   background-color: #333;
   color: #fff;
   border-radius: 2px;
@@ -204,6 +228,12 @@ input[type=text], textarea {
   z-index: 1;
   bottom: 30px;
   font-size: 17px;
+}
+.error {
+  font-size: 12px;
+  padding: 2px;
+  color: red;
+  display: flex;
 }
 #snackbar.show {
   visibility: visible;
